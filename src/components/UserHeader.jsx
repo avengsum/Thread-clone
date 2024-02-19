@@ -1,6 +1,7 @@
 import {Box,VStack ,Text, Flex } from '@chakra-ui/layout'
 import { Avatar,Link } from '@chakra-ui/react'
 import { PiInstagramLogo } from "react-icons/pi";
+import { PiDotsThreeCircle } from "react-icons/pi";
 
 const UserHeader = () => {
   return (
@@ -31,8 +32,11 @@ const UserHeader = () => {
           <Link color={"gray.light"}>instagram.com</Link>
         </Flex>
         <Flex>
-          <Box>
+          <Box className='icon-container'>
           <PiInstagramLogo size={24} cursor={"pointer"} />
+          </Box>
+          <Box className='icon-container'>
+          <PiDotsThreeCircle size={24} cursor={"pointer"} />
           </Box>
         </Flex>
       </Flex>
