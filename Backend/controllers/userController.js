@@ -1,6 +1,7 @@
 import User from "../models/userModel.js";
 import bcrypt from "bcryptjs";
 import generateToken from "../utils/generatetoken.js";
+import {v2 as cloudinary} from 'cloudinary';
 
 const getUserProfile = async (req, res) => {
 	const { username } = req.params;
@@ -44,6 +45,8 @@ const signupUser = async (req, res) => {
         name: newUser.name,
         username: newUser.username,
         email: newUser.email,
+        bio: newUser.bio,
+        profilePic: newUser.profilePic,
       });
     } else {
       res.status(400).json({ message: "Invalid user data" });
@@ -65,13 +68,14 @@ const loginUser = async (req, res) => {
 
     generateToken(user._id, res);
 
-    res
-      .status(200)
-      .json({
+    res.status(200).json({
         _id: user._id,
         name: user.name,
         email: user.email,
         username: user.username,
+        bio: user.bio,
+        profilePic: user.profilePic
+
       });
   } catch (error) {
     res.status(500).json({ messsage: error.message });
@@ -113,7 +117,8 @@ const followUnfollowUser = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-  const { name, email, username, password, profilePic, bio } = req.body;
+  const { name, email, username, password, bio } = req.body;
+  let {profilePic} = req.body;
   const userId = req.user._id;
   try {
     let user = await User.findById(userId);
@@ -128,6 +133,15 @@ const updateUser = async (req, res) => {
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt);
       user.password = hashedPassword;
+    }
+
+    if(profilePic){
+
+      if(user.profilePic){
+        await cloudinary.uploader.destroy(user.profilePic.split('/').pop().split('.')[0]);
+      }
+      const uploadRes = await cloudinary.uploader.upload(profilePic)
+      profilePic = uploadRes.secure_url;
     }
 
     user.name = name || user.name;

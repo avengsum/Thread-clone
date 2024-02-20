@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import userRoutes from './Routes/userRoutes.js'
 import cookieParser from "cookie-parser";
 import postRoutes from "./Routes/postRoutes.js";
+import {v2 as cloudinary} from 'cloudinary';
 
 dotenv.config();
 const app = express();
@@ -17,6 +18,14 @@ const app = express();
     process.exit(1);
   }
 })();
+
+
+cloudinary.config({ 
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
 
 const PORT = process.env.PORT || 5000;
 
