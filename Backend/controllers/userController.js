@@ -1,6 +1,6 @@
-import User from "../models/userModel";
+import User from "../models/userModel.js";
 import bcrypt from "bcryptjs";
-import generateToken from "../utils/generatetoken";
+import generateToken from "../utils/generatetoken.js";
 
 const getUserProfile = async (req, res) => {
 	const { username } = req.params;
@@ -26,7 +26,7 @@ const signupUser = async (req, res) => {
     }
 
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt(password, salt);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
     const newUser = new User({
       name,
@@ -50,7 +50,7 @@ const signupUser = async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
-    console.log("Error in singup:", error.message);
+    console.log("Error in signup:", error.message);
   }
 };
 
