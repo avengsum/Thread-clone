@@ -1,30 +1,38 @@
 import User from "../models/userModel.js";
 import Post from "../models/postModel.js";
+import { v2 as cloudinary } from "cloudinary";
 
 const createPost = async (req,res) => {
   try {
   
-    const {postedBy , text ,img} = req.body;
+    const {postedBy , text } = req.body;
+		let {img} = req.body;
 
     if(!postedBy || !text){
-      return res.status(400).json({message: "PostedBy and text fields are required"})
+      return res.status(400).json({error: "PostedBy and text fields are required"})
     }
 
     const user = await User.findById(postedBy);
 
     if(!user){
-      return res.status(404).json({message: "User not found"})
+      return res.status(404).json({error: "User not found"})
     }
 
     if(user._id.toString() !== req.user._id.toString()){
-      return res.status(400).json({message: "unauthorized to create post"})
+      return res.status(400).json({error: "unauthorized to create post"})
     }
 
     const maxLen = 500;
 
     if(text.length > maxLen){
-      return res.status(400).json({message: "Text length exceeded"});
+      return res.status(400).json({error: "Text length exceeded"});
     }
+
+		
+		if (img) {
+			const uploadedResponse = await cloudinary.uploader.upload(img);
+			img = uploadedResponse.secure_url;
+		}
 
     const newPost = new Post({postedBy,text,img});
 
@@ -33,7 +41,7 @@ const createPost = async (req,res) => {
     res.status(201).json({message: "Post saved successfully"});
 
   } catch (error) {
-    res.status(500).json({message:error.message});
+    res.status(500).json({error:error.message});
   }
 };
 
@@ -140,7 +148,7 @@ const getFeedPosts = async (req, res) => {
 
 		const feedPosts = await Post.find({ postedBy: { $in: following } }).sort({ createdAt: -1 });
 
-		res.status(200).json({ feedPosts });
+		res.status(200).json(feedPosts);
 	} catch (err) {
 		res.status(500).json({ message: err.message });
 	}

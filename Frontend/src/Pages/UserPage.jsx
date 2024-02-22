@@ -1,10 +1,41 @@
+import { useEffect, useState } from "react";
 import UserHeader from "../components/UserHeader";
 import UserPost from "../components/UserPost";
+import {useParams} from "react-router-dom"
+import useShowToast from "../hooks/useShowToast";
+import { useRecoilValue } from "recoil";
+import userAtom from "../atoms/userAtom";
 
 const UserPage = () => {
+
+	const [user,setUser] = useState(null)
+
+	const {username} = useParams()
+
+	const showToast = useShowToast();
+
+
+	
+	useEffect(() => {
+
+		const getUser = async () => {
+			try {
+				const res = await fetch(`/api/users/profile/${username}`);
+				const data = await res.json();
+				console.log(data)
+				setUser(data)
+			} catch (error) {
+				showToast("Error",error,"error")
+			}
+		}
+
+		getUser();
+
+	},[username])
+
 	return (
 		<>
-			<UserHeader />
+			<UserHeader user={user} />
 			<UserPost likes={1200} replies={481} postImg='/post1.png' postTitle="Let's talk about threads." />
 			<UserPost likes={451} replies={12} postImg='/post2.png' postTitle='Nice tutorial. Highly recommended.' />
 			<UserPost

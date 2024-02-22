@@ -20,7 +20,10 @@ import authScreenAtom from "../atoms/authAtom";
 import { useToast } from '@chakra-ui/react'
 import userAtom from "../atoms/userAtom";
 
+
+
 export default function LoginCard() {
+  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const setAuthScreen = useSetRecoilState(authScreenAtom);
@@ -36,6 +39,7 @@ export default function LoginCard() {
 
 
   const handleLogin = async () => {
+    setLoading(true);
     try {
       
       const res = await fetch('/api/users/login',{
@@ -68,6 +72,9 @@ export default function LoginCard() {
      catch (error) {
       console.log(error);
     }
+   finally {
+    setLoading(false);
+  }
   }
 
   return (
@@ -124,6 +131,7 @@ export default function LoginCard() {
                   bg: "blue.500",
                 }}
                 onClick={() => handleLogin()}
+                isLoading={loading}
               >
                 Login
               </Button>

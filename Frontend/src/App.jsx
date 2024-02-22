@@ -10,6 +10,7 @@ import HomePage from "./Pages/Homepage";
 import { Navigate } from "react-router-dom";
 import LogoutButton from "./components/LogoutButton";
 import UpdateProfilePage from "./Pages/UpdateUserProfile";
+import CreatePost from "./components/CreatePost";
 
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
       </Routes>
 
       {user && <LogoutButton />}
+      {user && <CreatePost />}
 
     </Container>
   );

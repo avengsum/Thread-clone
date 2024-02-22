@@ -2,6 +2,7 @@ import User from "../models/userModel.js";
 import bcrypt from "bcryptjs";
 import generateToken from "../utils/generatetoken.js";
 import {v2 as cloudinary} from 'cloudinary';
+import mongoose from "mongoose";
 
 const getUserProfile = async (req, res) => {
 	const { username } = req.params;

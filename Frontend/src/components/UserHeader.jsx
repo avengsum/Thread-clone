@@ -1,12 +1,52 @@
-import { Box, VStack, Text, Flex } from "@chakra-ui/layout";
-import { Avatar, Link } from "@chakra-ui/react";
+import { Box, VStack, Text, Flex  } from "@chakra-ui/layout";
+import { Avatar} from "@chakra-ui/react";
 import { PiInstagramLogo } from "react-icons/pi";
 import { PiDotsThreeCircle } from "react-icons/pi";
-import { Menu, MenuButton, MenuList, MenuItem, Portal } from "@chakra-ui/react";
+import { Menu, MenuButton, MenuList, MenuItem, Portal , Button } from "@chakra-ui/react";
 import { useToast } from "@chakra-ui/react";
+import { Link } from "react-router-dom";
+import { useState } from "react";
+import useShowToast from "../hooks/useShowToast";
+import { useRecoilValue } from "recoil";
+import userAtom from "../atoms/userAtom";
 
-const UserHeader = () => {
+
+const UserHeader = ({user}) => {
   const toast = useToast();
+
+  const showToast = useShowToast();
+
+  const currentUser = useRecoilValue(userAtom)
+
+  const [following , setFollowing]  = useState(user?.followers.some((follower) => follower._id === currentUser._id));
+
+  const handleFollowUnFollow = async () => {
+    try {
+      
+      const res = await fetch(`api/users/follow/${user._id}`,{
+        method:"POST",
+        headers: {
+          "Content-Type": "application/json",
+        }
+      });
+
+      const data = res.json();
+
+      console.log(data)
+
+      if(following){
+        showToast("Success",`Unfollowed ${user.name}`,"success");
+        user.followers.pop();
+      }else{
+        showToast("Success",`Followed ${user.name}`,"success");
+        user.followers.push(currentUser._id)
+      }
+      setFollowing(!following);
+
+    } catch (error) {
+      
+    }
+  }
 
   const copyURL = () => {
     const currentURL = window.location.href;
@@ -26,10 +66,10 @@ const UserHeader = () => {
       <Flex justifyContent={"space-between"} w={"full"}>
         <Box>
           <Text fontSize={"2xl"} fontWeight={"bold"}>
-            Mark Zuckerberg
+            {user?.name}
           </Text>
           <Flex gap={2} alignItems={"center"}>
-            <Text fontSize={"small"}>markzuckerberg</Text>
+            <Text fontSize={"small"}>{user?.username}</Text>
             <Text
               fontSize={"smaller"}
               bg={"gray.dark"}
@@ -42,17 +82,31 @@ const UserHeader = () => {
           </Flex>
         </Box>
         <Box>
-          <Avatar name="Mark zuckerberg" src="/zuck-avatar.png" size={"xl"} />
+          {user?.profilePic && (
+            <Avatar name={user?.name} src={user?.profilePic} size={"xl"} />
+          )} 
+          {!user?.profilePic && (
+            <Avatar name={user?.name} src="http://bit.ly/broken-link" size={"xl"} />
+          )} 
         </Box>
       </Flex>
       <Text>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt,
-        repellat! Enim quam est minus eveniet officiis voluptatibus sunt sed
-        commodi corrupti dolorum hic facilis rem eius, autem sint dicta eos?
+        {user?.bio}
       </Text>
+      {currentUser?._id === user?._id && (
+        <Link to="/update">
+        <Button size={"sm"}>Update Profile</Button></Link>
+      )
+      }
+      {currentUser?._id === user?._id && (
+
+        <Button onClick={() => handleFollowUnFollow} size={"sm"}>{following ? "UnFollow" : "Follow" }</Button>
+      )
+      }
+
       <Flex w={"full"} justifyContent={"space-between"}>
         <Flex gap={2} alignItems={"center"}>
-          <Text>3.2k followers</Text>
+          <Text>{user?.followers.lenght} followers</Text>
           <Box w="1" h="1" bg={"gray.light"} borderRadius={"full"}></Box>
           <Link color={"gray.light"}>instagram.com</Link>
         </Flex>
