@@ -18,7 +18,7 @@ const UserHeader = ({user}) => {
 
   const currentUser = useRecoilValue(userAtom)
 
-  const [following , setFollowing]  = useState(user?.followers.some((follower) => follower._id === currentUser._id));
+  const [following, setFollowing] = useState(user?.followers ? user?.followers.includes(currentUser?._id) : false);
 
   const handleFollowUnFollow = async () => {
     try {
@@ -36,10 +36,10 @@ const UserHeader = ({user}) => {
 
       if(following){
         showToast("Success",`Unfollowed ${user.name}`,"success");
-        user.followers.pop();
+        user?.followers.pop();
       }else{
         showToast("Success",`Followed ${user.name}`,"success");
-        user.followers.push(currentUser._id)
+        user?.followers.push(currentUser?._id);
       }
       setFollowing(!following);
 
@@ -106,7 +106,7 @@ const UserHeader = ({user}) => {
 
       <Flex w={"full"} justifyContent={"space-between"}>
         <Flex gap={2} alignItems={"center"}>
-          <Text>{user?.followers.lenght} followers</Text>
+          <Text>{user?.followers ? user.followers.length : 0}followers</Text>
           <Box w="1" h="1" bg={"gray.light"} borderRadius={"full"}></Box>
           <Link color={"gray.light"}>instagram.com</Link>
         </Flex>

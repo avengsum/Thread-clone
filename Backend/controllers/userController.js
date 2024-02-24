@@ -3,11 +3,19 @@ import bcrypt from "bcryptjs";
 import generateToken from "../utils/generatetoken.js";
 import {v2 as cloudinary} from 'cloudinary';
 import mongoose from "mongoose";
+import Post from "../models/postModel.js";
 
 const getUserProfile = async (req, res) => {
-	const { username } = req.params;
+  const { username } = req.params;
+  console.log("seach started")
 	try {
-		const user = await User.findOne({ username }).select("-password").select("-updatedAt");
+		let user;
+		if (mongoose.Types.ObjectId.isValid(username)) {
+			user = await User.findOne({ _id: username }).select("-password").select("-updatedAt");
+		} else {
+			// username is username
+			user = await User.findOne({ username }).select("-password").select("-updatedAt");
+		}
 		if (!user) return res.status(404).json({ message: "User not found" });
 
 		res.status(200).json(user);
@@ -152,6 +160,17 @@ const updateUser = async (req, res) => {
     user.bio = bio || user.bio;
 
     user = await user.save();
+
+    await Post.updateMany(
+			{ "replies.userId": userId },
+			{
+				$set: {
+					"replies.$[reply].username": user.username,
+					"replies.$[reply].userProfilePic": user.profilePic,
+				},
+			},
+			{ arrayFilters: [{ "reply.userId": userId }] }
+		);
 
     res.status(200).json({ message: "Profile updated successfully", user });
   } catch (err) {
