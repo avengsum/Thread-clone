@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import userRoutes from './Routes/userRoutes.js'
 import cookieParser from "cookie-parser";
 import postRoutes from "./Routes/postRoutes.js";
+import messageRoutes from "./Routes/messageRoutes.js";
 import {v2 as cloudinary} from 'cloudinary';
 
 dotenv.config();
@@ -35,5 +36,6 @@ app.use(cookieParser());
 
 app.use("/api/users",userRoutes)
 app.use('/api/posts',postRoutes)
+app.use('api/message',messageRoutes)
 
 app.listen(PORT, () => console.log(`Listing on port ${PORT}`));
