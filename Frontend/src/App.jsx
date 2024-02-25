@@ -1,38 +1,48 @@
-import { Container } from "@chakra-ui/react";
-import {Route ,Routes} from 'react-router-dom'
-import UserPage from "./Pages/UserPage";
-import PostPage from "./Pages/PostPage";
+import { Box, Container } from "@chakra-ui/react";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
+import UserPage from "./pages/UserPage";
+import PostPage from "./pages/PostPage";
 import Header from "./components/Header";
-import Auth from "./Pages/Auth";
+import HomePage from "./pages/HomePage";
+import AuthPage from "./pages/AuthPage";
 import { useRecoilValue } from "recoil";
 import userAtom from "./atoms/userAtom";
-import HomePage from "./Pages/Homepage";
-import { Navigate } from "react-router-dom";
-import LogoutButton from "./components/LogoutButton";
-import UpdateProfilePage from "./Pages/UpdateUserProfile";
-
-
+import UpdateProfilePage from "./pages/UpdateProfilePage";
+import CreatePost from "./components/CreatePost";
+import ChatPage from "./pages/ChatPage";
+import { SettingsPage } from "./pages/SettingsPage";
 function App() {
+	const user = useRecoilValue(userAtom);
+	const { pathname } = useLocation();
+	return (
+		<Box position={"relative"} w='full'>
+			<Container maxW={pathname === "/" ? { base: "620px", md: "900px" } : "620px"}>
+				<Header />
+				<Routes>
+					<Route path='/' element={user ? <HomePage /> : <Navigate to='/auth' />} />
+					<Route path='/auth' element={!user ? <AuthPage /> : <Navigate to='/' />} />
+					<Route path='/update' element={user ? <UpdateProfilePage /> : <Navigate to='/auth' />} />
 
-  const user = useRecoilValue(userAtom);
-
-  console.log(user)
-
-  return ( 
-    <Container maxW="620px">
-      <Header />
-      <Routes>
-        <Route path="/" element={ user ? <HomePage /> : <Navigate to='/auth' />} />
-        <Route path="/:username" element = {<UserPage />} />
-        <Route path="/update" element={user ? <UpdateProfilePage /> : <Navigate to="/auth" />} />
-        <Route path="/auth" element={!user ? <Auth /> : <Navigate to="/" />} />
-        <Route path="/:username/post/:pid" element={<PostPage />} />
-      </Routes>
-
-      {user && <LogoutButton />}
-
-    </Container>
-  );
+					<Route
+						path='/:username'
+						element={
+							user ? (
+								<>
+									<UserPage />
+									<CreatePost />
+								</>
+							) : (
+								<UserPage />
+							)
+						}
+					/>
+					<Route path='/:username/post/:pid' element={<PostPage />} />
+					<Route path='/chat' element={user ? <ChatPage /> : <Navigate to={"/auth"} />} />
+					<Route path='/settings' element={user ? <SettingsPage /> : <Navigate to={"/auth"} />} />
+				</Routes>
+			</Container>
+		</Box>
+	);
 }
 
 export default App;
