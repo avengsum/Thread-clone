@@ -21,13 +21,11 @@ import {
 import { useRef, useState } from "react";
 import usePreviewImg from "../hooks/usePreviewImg";
 import { BsFillImageFill } from "react-icons/bs";
+import { useRecoilState, useRecoilValue } from "recoil";
 import userAtom from "../atoms/userAtom";
 import useShowToast from "../hooks/useShowToast";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import postsAtom from "../atoms/postsAtom";
 import { useParams } from "react-router-dom";
-import checkPost from "../atoms/checkPost";
-
 
 const MAX_CHAR = 500;
 
@@ -40,10 +38,8 @@ const CreatePost = () => {
 	const user = useRecoilValue(userAtom);
 	const showToast = useShowToast();
 	const [loading, setLoading] = useState(false);
-  const [posts, setPosts] = useRecoilState(postsAtom);
+	const [posts, setPosts] = useRecoilState(postsAtom);
 	const { username } = useParams();
-
-	const checkPosts = useSetRecoilState(checkPost);
 
 	const handleTextChange = (e) => {
 		const inputText = e.target.value;
@@ -74,18 +70,15 @@ const CreatePost = () => {
 				showToast("Error", data.error, "error");
 				return;
 			}
-      showToast("Success", "Post created successfully", "success");
+			showToast("Success", "Post created successfully", "success");
 			if (username === user.username) {
 				setPosts([data, ...posts]);
 			}
-			showToast("Success", "Post created successfully", "success");
-			checkPosts((value) => !value)
 			onClose();
 			setPostText("");
 			setImgUrl("");
 		} catch (error) {
-			showToast("Error", error.toString(), "error");
-      console.log(error)
+			showToast("Error", error, "error");
 		} finally {
 			setLoading(false);
 		}
@@ -99,6 +92,7 @@ const CreatePost = () => {
 				right={5}
 				bg={useColorModeValue("gray.300", "gray.dark")}
 				onClick={onOpen}
+				size={{ base: "sm", sm: "md" }}
 			>
 				<AddIcon />
 			</Button>
