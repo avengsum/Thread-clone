@@ -15,6 +15,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20'
+
+      - name : Change to frontend directory
+        run: cd Frontend
       
       - name: Install Dependencies
         run : npm Install
